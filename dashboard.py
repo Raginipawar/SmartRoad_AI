@@ -387,17 +387,17 @@ def compute_action(detections, phone_dur, gaze_dur, ppo_model, obs_builder, phon
     return "ALL CLEAR"
 
 def main():
-    st.set_page_config(page_title="SmartRoad AI", layout="wide", initial_sidebar_state="collapsed")
+    st.set_page_config(page_title=" Driver Distraction Detection ", layout="wide", initial_sidebar_state="expanded")
     apply_custom_css()
     init_session_state()
 
     st.markdown("""
     <div class="custom-header">
         <div class="header-left">
-            <div class="header-icon">🚗</div>
+            <div class="header-icon"></div>
             <div>
-                <div class="header-title">SmartRoad AI</div>
-                <div class="header-subtitle">Driver Distraction Detection · IEEE CIS VIT Pune · ML2308</div>
+                <div class="header-title"> Driver Distraction Detection</div>
+                <div class="header-subtitle">Context-aware Driver Distraction Detection using semantic</div>
             </div>
         </div>
         <div class="model-badges">
@@ -409,36 +409,27 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    # ── Main page controls bar ─────────────────────────────────────────────────
-    ctrl1, ctrl2, ctrl3, ctrl4, ctrl5 = st.columns([1, 1, 2, 1, 1])
-    with ctrl1:
-        if st.button("▶  Start", type="primary", use_container_width=True):
-            st.session_state.running = True
-            st.session_state.session_start = time.time()
-            st.session_state.violations = []
-            st.session_state.frame_count = 0
-            st.session_state.total_violations = 0
-            st.session_state.phone_frames = 0
-            st.session_state.gaze_frames = 0
-    with ctrl2:
-        if st.button("⏹  Stop", use_container_width=True):
-            st.session_state.running = False
-    with ctrl3:
-        input_source = st.radio(" ", ["Webcam (Live)", "Video File"],
-                                horizontal=True, label_visibility="collapsed")
-    with ctrl4:
-        if st.button("🗑  Clear Log", use_container_width=True):
-            st.session_state.violations = []
-            st.session_state.total_violations = 0
-            st.rerun()
-    with ctrl5:
+    with st.sidebar:
+        st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
+        st.markdown('<p class="section-title">Controls</p>', unsafe_allow_html=True)
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("▶ Start", type="primary", use_container_width=True):
+                st.session_state.running = True
+                st.session_state.session_start = time.time()
+        with col2:
+            if st.button("⏹ Stop", use_container_width=True):
+                st.session_state.running = False
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
+        st.markdown('<p class="section-title">Input Source</p>', unsafe_allow_html=True)
+        input_source = st.radio(" ", ["Webcam (Live)", "Video File"], label_visibility="collapsed")
         video_file = None
         if input_source == "Video File":
-            video_file = st.file_uploader("Upload", type=['mp4'], label_visibility="collapsed")
+            video_file = st.file_uploader("Upload .mp4 file", type=['mp4'])
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown("<div style='margin-bottom:0.8rem'></div>", unsafe_allow_html=True)
-
-    with st.sidebar:
         st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
         st.markdown('<p class="section-title">Thresholds</p>', unsafe_allow_html=True)
         phone_threshold = st.slider("Phone violation (seconds)", 1, 10, 3)
@@ -451,6 +442,13 @@ def main():
         st.metric("Elapsed Time", f"{elapsed_time//60:02d}:{elapsed_time%60:02d}")
         st.metric("Total Frames", st.session_state.frame_count)
         st.metric("Total Violations", st.session_state.total_violations)
+        if st.button("Clear Log", use_container_width=True):
+            st.session_state.violations = []
+            st.session_state.total_violations = 0
+            st.session_state.frame_count = 0
+            st.session_state.phone_frames = 0
+            st.session_state.gaze_frames = 0
+            st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown("""
@@ -613,7 +611,7 @@ def main():
     else:
         video_placeholder.markdown(
             '<div style="background:#1A1A1A;height:420px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:14px;gap:12px;">'
-            '<div style="font-size:2.5rem;">🚗</div>'
+            '<div style="font-size:2.5rem;"></div>'
             '<p style="color:#555;font-size:1rem;font-weight:500;margin:0;">Press Start to begin detection</p>'
             '<p style="color:#333;font-size:0.78rem;margin:0;">SegFormer · YOLOv8 · PPO</p>'
             '</div>',
